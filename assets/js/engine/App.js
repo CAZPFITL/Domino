@@ -1,8 +1,8 @@
 import AppMethods from './utils/AppMethods.js';
 
 export default class App extends AppMethods {
-    constructor(onWindow, game) {
-        super(game, true);
+    constructor(onWindow, game, verbose = true) {
+        super(game, verbose);
         onWindow && (window.app = this);
     }
 }

@@ -1,4 +1,5 @@
 import {GAME_OVER, PLAY} from "../../env.js";
+import Domino from '../entities/Domino.js'
 
 export default class GameLevel {
     constructor({app, game, addedRules}) {
@@ -9,108 +10,39 @@ export default class GameLevel {
         this.color = '#523f32';
         this.addedRules = addedRules;
         this.map = null;
-        // this.loadEntitiesList = game.constructor.name === 'Domino' && [
-            // {
-            //     name: 'Token',
-            //     props: {amount: 5}
-            // }, {
-            //     name: 'Anthill',
-            //     props: {ants: 1, free: true},
-            // }];
-        game.constructor.name === 'Domino' && this.loadEntities();
+
+        this.loadEntitiesList = this.game.constructor.name === 'Domino' && [
+            ...this.getDominoes()
+        ];
+        this.game.constructor.name === 'Domino' && this.loadEntities();
         this.app.factory.addGameEntity(this);
     }
 
-    // /**
-    //  * Private Methods
-    //  */
-    // #getBordersEdges() {
-    //     const [topLeft, bottomLeft, topRight, bottomRight] = [
-    //         {x: (-this.size.width) / 2, y: (-this.size.height) / 2},
-    //         {x: (-this.size.width) / 2, y: (this.size.height) / 2},
-    //         {x: (this.size.width) / 2, y: (-this.size.height) / 2},
-    //         {x: (this.size.width) / 2, y: (this.size.height) / 2}
-    //     ];
-    //     this.boundTargets = {
-    //         // These are the bounds for the ants sensors
-    //         walls: [
-    //             // Left
-    //             {x: topLeft.x, y: topLeft.y},
-    //             {x: bottomLeft.x, y: bottomLeft.y},
-    //             // Right
-    //             {x: topRight.x, y: topRight.y},
-    //             {x: bottomRight.x, y: bottomRight.y},
-    //             // Bottom
-    //             {x: bottomLeft.x, y: bottomLeft.y},
-    //             {x: bottomRight.x, y: bottomRight.y},
-    //             // Top
-    //             {x: topLeft.x, y: topLeft.y},
-    //             {x: topRight.x, y: topRight.y}
-    //         ]
-    //     }
-    //     this.wallPolygons = [
-    //         // Left
-    //         {
-    //             coords: {
-    //                 x: bottomLeft.x,
-    //                 y: 0
-    //             },
-    //             polygons: [
-    //                 {x: topLeft.x, y: topLeft.y},
-    //                 {x: bottomLeft.x, y: bottomLeft.y},
-    //                 {x: topLeft.x - 1, y: topLeft.y},
-    //                 {x: bottomLeft.x - 1, y: bottomLeft.y},
-    //             ]
-    //         },
-    //         // Bottom
-    //         {
-    //             coords: {
-    //                 x: 0,
-    //                 y: bottomRight.y
-    //             },
-    //             polygons: [
-    //                 {x: bottomLeft.x, y: bottomLeft.y},
-    //                 {x: bottomRight.x, y: bottomRight.y},
-    //                 {x: bottomLeft.x, y: bottomLeft.y + 1},
-    //                 {x: bottomRight.x, y: bottomRight.y + 1},
-    //             ]
-    //         },
-    //         // Right
-    //         {
-    //             coords: {
-    //                 x: bottomRight.x,
-    //                 y: 0
-    //             },
-    //             polygons: [
-    //                 {x: topRight.x, y: topRight.y},
-    //                 {x: bottomRight.x, y: bottomRight.y},
-    //                 {x: topRight.x + 1, y: topRight.y},
-    //                 {x: bottomRight.x + 1, y: bottomRight.y},
-    //             ]
-    //         },
-    //         // Top
-    //         {
-    //             coords: {
-    //                 x: 0,
-    //                 y: topRight.y
-    //             },
-    //             polygons: [
-    //                 {x: topLeft.x, y: topLeft.y},
-    //                 {x: topRight.x, y: topRight.y},
-    //                 {x: topLeft.x, y: topLeft.y - 1},
-    //                 {x: topRight.x, y: topRight.y - 1}
-    //             ]
-    //         },
-    //     ]
-    // }ß
+    getDominoes(base = [1, 2, 3, 4, 5, 6]) {
+        const output = [];
+        base.forEach((a) => {
+            base.forEach((b) => {
+                output.push({
+                    name: 'Domino',
+                    props: {
+                        app: this.app, coords: {
+                            x: (a * 20 + 5),
+                            y: (b * 40 + 5),
+                        }, value: [a, b]
+                    }
+                })
+            })
+        })
+        return output;
+    }
 
     /**
      * Load methods
      */
     loadEntities() {
-        // for (let entity of this?.loadEntitiesList) {
-        //     entity?.name && this[entity.name](entity.props);
-        // }
+        for (let entity of this?.loadEntitiesList) {
+            entity?.name && this[entity.name](entity.props);
+        }
     }
 
     #loadOutsideRules() {
@@ -122,6 +54,10 @@ export default class GameLevel {
                 })
             }
         }
+    }
+
+    Domino(props) {
+        this.app.factory.create(Domino, props);
     }
 
     update() {
