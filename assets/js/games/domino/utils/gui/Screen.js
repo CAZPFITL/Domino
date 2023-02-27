@@ -75,7 +75,7 @@ export default class Screen extends ScreenHelpers {
                 }
             },
             PLAY: {
-                background: COLORS.GREEN[0],
+                background: '#a7b2b7',
             }
         };
 
