@@ -7,6 +7,7 @@ export const dominoSize = {
 
 export default class Domino {
     constructor({id = 0, app, size, coords, angle, rotationSpeed, value}) {
+        this.id = id;
         this.app = app;
         this.size = size ? size : dominoSize;
         this.coords = coords ? coords : {
@@ -63,9 +64,12 @@ export default class Domino {
 
     draw() {
         if (!this.no_draw && this.app.game.state.state === PLAY || this.app.game.state.state === GAME_OVER) {
-            this.color = '#33333366'
-            this.app.gui.get.drawPolygon(this.app.gui.ctx, this);
-            this.app.gui.get.drawImage(this.app.gui.ctx, this, 400, 800);
+            this.color = '#DDDDDD'
+            if (this.isFliped) {
+                this.app.gui.get.drawPolygon(this.app.gui.ctx, this);
+            } else {
+                this.app.gui.get.drawImage(this.app.gui.ctx, this, 400, 800);
+            }
             // (this.amount < this.initialSize) &&
             // this.app.gui.get.bar({
             //     ctx: this.app.gui.ctx,

@@ -124,7 +124,7 @@ export default class Screen extends ScreenHelpers {
                         widthStroke: 8,
                         callbacks: {
                             mouseup: () => {
-                                this.app.game.state.setState('PLAY');
+                                this.app.game.state.setState('LOADING');
                                 // this.app.game.useMusicBox && this.app.musicBox.play();
                             }
                         }
@@ -195,6 +195,23 @@ export default class Screen extends ScreenHelpers {
                         text: this.app.game.constructor.name,
                         x: 0,
                         y: mainMenuButtonBase.y - 50,
+                        // y: -(mainMenuButtonMeasure.height * (Object.keys(this.buttonsCollection.MAIN_MENU).length / 2) + 20),
+                        color: this.colors.MAIN_MENU.mainCard.text,
+                        width: 0,
+                        height: 0,
+                        center: true
+                    }
+                }
+            },
+            LOADING: {
+                title: {
+                    type: 'text',
+                    props: {
+                        ctx: this.app.gui.ctx,
+                        font: '72px Mouse',
+                        text: 'LOADING GAME...',
+                        x: 50,
+                        y: mainMenuButtonBase.y + 72,
                         // y: -(mainMenuButtonMeasure.height * (Object.keys(this.buttonsCollection.MAIN_MENU).length / 2) + 20),
                         color: this.colors.MAIN_MENU.mainCard.text,
                         width: 0,

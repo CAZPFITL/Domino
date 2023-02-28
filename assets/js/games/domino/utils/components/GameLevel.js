@@ -30,7 +30,7 @@ export default class GameLevel {
                         app: this.app,
                         coords: {
                             x: (a * (dominoSize.width + 10)),
-                            y: (b * (dominoSize.height + 10)),
+                            y: (b * (dominoSize.height + 10)) - 200,
                         }, value: [a, b]
                     }
                 });

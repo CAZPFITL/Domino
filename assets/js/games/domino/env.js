@@ -1,3 +1,4 @@
+export const LOADING = 'LOADING';
 export const LOAD_GAME_DATA = 'LOAD_GAME_DATA';
 export const LOAD_GAME_LEVEL = 'LOAD_GAME_LEVEL';
 export const GAME_OVER = 'GAME_OVER';
@@ -11,6 +12,7 @@ export const NETWORK = 'NETWORK';
 export const STATES = [
     LOAD_GAME_DATA,
     LOAD_GAME_LEVEL,
+    LOADING,
     GAME_OVER,
     PLAY,
     MAIN_MENU,
