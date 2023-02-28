@@ -15,7 +15,7 @@ export default class Player {
      */
     #addListeners() {
         // Change Controlled Entity
-        this.app.controls.pushListener(this, 'click', (event) => {
+        this.app.controls.pushListener(this, 'click', (/*event*/) => {
             // const coords = this.app.gui.get.clickCoords(event, this.app.camera.viewport);
             // const ant = this.app.gui.get.entityAt(coords, this.app.factory.binnacle.Ant);
         });

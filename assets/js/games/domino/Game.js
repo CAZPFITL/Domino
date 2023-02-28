@@ -50,9 +50,9 @@ export default class Domino {
         this.state.setState('MAIN_MENU');
     }
 
-    #restart() {
-        this.app.factory.binnacle = {GameObjects: this.app.factory.binnacle.GameObjects};
-    }
+    // #restart() {
+    //     this.app.factory.binnacle = {GameObjects: this.app.factory.binnacle.GameObjects};
+    // }
 
     /**
      * Draw and Update methods
