@@ -96,11 +96,11 @@ export default class Screen extends ScreenHelpers {
             height: 300,
         };
 
-        const height = 190;
-
-        const width = 400;
-
-        const cardPosition = {x: 10, y: 10};
+        // const height = 190;
+        //
+        // const width = 400;
+        //
+        // const cardPosition = {x: 10, y: 10};
 
         const displacement = (mainMenuButtonBase.height + mainMenuButtonBase.space);
 
@@ -203,20 +203,20 @@ export default class Screen extends ScreenHelpers {
                     }
                 }
             },
-            PLAY: {
-                data_card: {
-                    type: 'square',
-                    props: {
-                        ctx: this.app.game.gui.controlsCtx,
-                        x: cardPosition.x,
-                        y: cardPosition.y,
-                        width: width + 35,
-                        height,
-                        color: COLORS.WHITE[4],
-                        stroke: COLORS.BLACK[0]
-                    }
-                }
-            }
+            // PLAY: {
+            //     data_card: {
+            //         type: 'square',
+            //         props: {
+            //             ctx: this.app.game.gui.controlsCtx,
+            //             x: cardPosition.x,
+            //             y: cardPosition.y,
+            //             width: width + 35,
+            //             height,
+            //             color: COLORS.WHITE[4],
+            //             stroke: COLORS.BLACK[0]
+            //         }
+            //     }
+            // }
         };
     }
 }

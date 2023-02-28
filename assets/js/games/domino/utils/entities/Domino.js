@@ -1,24 +1,27 @@
 import {GAME_OVER, PLAY} from "../../env.js";
 
+export const dominoSize = {
+    width: 40,
+    height: 80
+}
+
 export default class Domino {
-    constructor({app, size, coords, angle, rotationSpeed, value}) {
+    constructor({id = 0, app, size, coords, angle, rotationSpeed, value}) {
         this.app = app;
-        this.size = size ? size : {
-            width: 20,
-            height: 40
-        };
+        this.size = size ? size : dominoSize;
         this.coords = coords ? coords : {
             x: 0,
             y: 0
         };
         this.isFliped = false;
+        this.frameCounter = id;
         this.angle = angle ?? 0;
         this.rotationSpeed = rotationSpeed ?? 0.07;
         this.value = [...value];
         this.no_update = false;
         this.no_draw = false;
         this.img = new Image((this.size.width), (this.size.height));
-        this.img.src = './assets/images/grid.png';
+        this.img.src = './assets/images/Fichas1.png';
     }
 
 
@@ -60,8 +63,9 @@ export default class Domino {
 
     draw() {
         if (!this.no_draw && this.app.game.state.state === PLAY || this.app.game.state.state === GAME_OVER) {
+            this.color = '#33333366'
             this.app.gui.get.drawPolygon(this.app.gui.ctx, this);
-            // this.app.gui.get.drawImage(this.app.gui.ctx, this, 45, 60);
+            this.app.gui.get.drawImage(this.app.gui.ctx, this, 400, 800);
             // (this.amount < this.initialSize) &&
             // this.app.gui.get.bar({
             //     ctx: this.app.gui.ctx,
