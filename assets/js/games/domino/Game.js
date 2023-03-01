@@ -54,7 +54,9 @@ export default class Domino {
             game: this
         })
         this.app.camera.zoom = this.app.camera.maxZoom;
-        this.state.setState('PLAY');
+        setTimeout(()=>{
+            this.state.setState('PLAY');
+        }, 1000)
     }
 
     #restart() {
