@@ -17,6 +17,7 @@ export default class Domino {
         this.loadCallback = loadCallback;
         this.gui = new Gui(this.app, this);
         this.app.factory.addGameEntity(this.gui);
+        this.loadCache = false;
         this.flags = gameFlags;
         this.state = new States(app, this, 'LOAD_GAME_DATA', STATES);
         this.app.factory.addGameEntity(this);
@@ -49,15 +50,20 @@ export default class Domino {
     }
 
     #loadGameLevel() {
-        this.level = new GameLevel({
-            app,
-            game: this
-        })
-        this.app.camera.zoom = this.app.camera.maxZoom;
-        setTimeout(()=>{
-            this.state.setState('PLAY');
-        }, 1000)
+        if (!this.loadCache) {
+            setTimeout(()=>{
+                this.level = new GameLevel({
+                    app,
+                    game: this
+                })
+                this.app.camera.zoom = this.app.camera.maxZoom;
+                this.state.setState('PLAY');
+               this.loadCache = false
+            }, 500)
+            this.loadCache = true
+        }
     }
+
 
     #restart() {
         this.app.factory.binnacle = {GameObjects: this.app.factory.binnacle.GameObjects};

@@ -29,9 +29,6 @@ export default class Board {
             Matter.Bodies.rectangle(0, -y, width, 20, {isStatic: true}),
             Matter.Bodies.rectangle(x, 0, 20, height, {isStatic: true}),
             Matter.Bodies.rectangle(-x, 0, 20, height, {isStatic: true}),
-            // Matter.Bodies.rectangle(400, 600, 800, 50, {isStatic: true}),
-            // Matter.Bodies.rectangle(800, 300, 50, 600, {isStatic: true}),
-            // Matter.Bodies.rectangle(0, 300, 50, 600, {isStatic: true})
         ]
 
         Matter.Composite.add(app.matter.engine.world, this.bodyParts);
