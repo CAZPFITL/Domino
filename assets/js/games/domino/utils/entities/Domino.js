@@ -10,8 +10,8 @@ const _default = [false,false]
 export default class Domino {
     constructor({id = 0, app, size = _default, coords = _default, value}) {
         const [x, y, width, height] = [
-            (coords[0] ? coords[0] : 400),
-            (coords[1] ? coords[1] : 200),
+            (coords[0] ? coords[0] : Math.random() * 200),
+            (coords[1] ? coords[1] : Math.random() * 200),
             (size[0] ? size[0] : dominoSize.width),
             (size[1] ? size[1] : dominoSize.height)
         ];
@@ -26,8 +26,8 @@ export default class Domino {
         this.img = new Image(width, height);
         this.img.src = './assets/images/Fichas1.png';
 
-        this.body = Matter.Bodies.rectangle(x, y, width, height);
-        this.size = dominoSize
+        this.body = Matter.Bodies.rectangle(x, y, width, height, {angle: Math.random() * 8});
+        this.size = {width, height}
 
         Matter.Composite.add(app.matter.engine.world, [this.body]);
     }

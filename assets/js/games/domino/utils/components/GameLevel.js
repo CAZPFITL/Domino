@@ -1,23 +1,54 @@
 import {GAME_OVER, PLAY} from "../../env.js";
 import Domino, {dominoSize} from '../entities/Domino.js'
+import Board from '../entities/Board.js'
 
 export default class GameLevel {
-    constructor({app, game, addedRules}) {
+    constructor({app, game, addedRules = []}) {
         this.app = app;
         this.game = game;
-        this.coords = {x: -2000 / 2, y: -1000 / 2};
-        this.size = {width: 2000, height: 1000}
-        this.color = '#523f32';
         this.addedRules = addedRules;
-        this.map = null;
-
-        this.loadEntitiesList = this.game.constructor.name === 'Domino' && [
-            ...this.getDominoes()
+        this.classes = {
+            Domino,
+            Board,
+        }
+        this.loadEntitiesList = [
+            ...this.getDominoes(),
+            {
+                name: 'Board',
+                props: {
+                    app: this.app,
+                }
+            }
         ];
-        this.game.constructor.name === 'Domino' && this.loadEntities();
+        this.load('entities');
         this.app.factory.addGameEntity(this);
+
     }
 
+    /**
+     * Load methods
+     */
+    load(type) {
+        if (type === 'entities') {
+            for (let entity of this?.loadEntitiesList) {
+                entity?.name && this.app.factory.create(this.classes[entity.name], entity.props);
+            }
+        }
+        if (type === 'rules') {
+            for (let rule of this.addedRules) {
+                if (this.app.factory.binnacle[rule.name]) {
+                    this.app.factory.binnacle[rule.name].forEach(entity => {
+                        if (entity instanceof Array) return;
+                        rule?.rule(entity);
+                    })
+                }
+            }
+        }
+    }
+
+    /*
+     * Game methods
+     */
     getDominoes(base = [1, 2, 3, 4, 5, 6]) {
         const output = [];
         let idCounter = 0;
@@ -40,33 +71,8 @@ export default class GameLevel {
         return output;
     }
 
-    /**
-     * Load methods
-     */
-    loadEntities() {
-        for (let entity of this?.loadEntitiesList) {
-            entity?.name && this[entity.name](entity.props);
-        }
-    }
-
-    // #loadOutsideRules() {
-    //     for (let rule of this.addedRules) {
-    //         if (this.app.factory.binnacle[rule.name]) {
-    //             this.app.factory.binnacle[rule.name].forEach(entity => {
-    //                 if (entity instanceof Array) return;
-    //                 rule?.rule(entity);
-    //             })
-    //         }
-    //     }
-    // }
-
-    Domino(props) {
-        this.app.factory.create(Domino, props);
-    }
-
     update() {
-        // this.#getBordersEdges();
-        // this.#loadOutsideRules();
+        this.load('rules');
     }
 
     /**
@@ -76,8 +82,8 @@ export default class GameLevel {
         if (this.app.game.state.state === PLAY ||
             this.app.game.state.state === GAME_OVER) {
             // TODO change this to get the level
-            this.app.gui.ctx.fillStyle = this.color;
-            this.app.gui.ctx.fillRect(this.coords.x, this.coords.y, this.size.width, this.size.height);
+            // this.app.gui.ctx.fillStyle = this.color;
+            // this.app.gui.ctx.fillRect(this.coords.x, this.coords.y, this.size.width, this.size.height);
         }
     }
 }

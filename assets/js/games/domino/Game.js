@@ -42,8 +42,8 @@ export default class Domino {
         // update gravity to zero
         this.app.matter.engine.gravity = {
             "x": 0,
-            "y": 1,
-            "scale": 0
+            "y": 0,
+            "scale": 0.001
         }
 
     }
@@ -53,12 +53,14 @@ export default class Domino {
             app,
             game: this
         })
+        this.app.camera.zoom = this.app.camera.maxZoom;
         this.state.setState('PLAY');
     }
 
-    // #restart() {
-    //     this.app.factory.binnacle = {GameObjects: this.app.factory.binnacle.GameObjects};
-    // }
+    #restart() {
+        this.app.factory.binnacle = {GameObjects: this.app.factory.binnacle.GameObjects};
+        this.#loadGameLevel();
+    }
 
     /**
      * Draw and Update methods

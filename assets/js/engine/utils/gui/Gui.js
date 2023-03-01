@@ -115,18 +115,21 @@ export default class Gui {
         entity.polygons = points;
     }
 
-    static drawPolygon(ctx, entity) {
-        if (entity.polygons.length < 1) return;
+    static drawPolygon(ctx, entity, type = 'fill') {
+        console.log(entity)
+        if (entity.vertices.length < 1) return;
 
         ctx.beginPath();
-        ctx.moveTo(entity.polygons[0].x, entity.polygons[0].y);
+        ctx.moveTo(entity.vertices[0].x, entity.vertices[0].y);
 
-        for (let i = 1; i < entity.polygons.length; i++) {
-            ctx.lineTo(entity.polygons[i].x, entity.polygons[i].y);
+        for (let i = 1; i < entity.vertices.length; i++) {
+            ctx.lineTo(entity.vertices[i].x, entity.vertices[i].y);
         }
 
+        ctx.lineTo(entity.vertices[0].x, entity.vertices[0].y);
+
         ctx.fillStyle = entity.color ?? '#000';
-        ctx.fill();
+        ctx[type]();
     }
 
     static drawImage(ctx, entity, width, height) {
