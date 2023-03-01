@@ -38,7 +38,14 @@ export default class Domino {
         // Run Load Callback From Engine
         this.loadCallback();
         // Set State to LOAD_GAME_LEVEL
-        this.state.setState('MAIN_MENU')
+        this.state.setState('MAIN_MENU');
+        // update gravity to zero
+        this.app.matter.engine.gravity = {
+            "x": 0,
+            "y": 1,
+            "scale": 0
+        }
+
     }
 
     #loadGameLevel() {
@@ -46,9 +53,7 @@ export default class Domino {
             app,
             game: this
         })
-        setTimeout(()=>{
-            this.state.setState('PLAY');
-        }, 200)
+        this.state.setState('PLAY');
     }
 
     // #restart() {

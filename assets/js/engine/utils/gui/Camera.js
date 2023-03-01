@@ -75,7 +75,7 @@ export default class Camera {
             } else {
                 if (event.shiftKey) {
                     this.#moveTo([
-                        this.lookAt[0] + Math.floor(deltaX > 0 ? deltaX : deltaY),
+                        this.lookAt[0] + Math.floor(deltaX),
                         this.lookAt[1]
                     ]);
                 } else {
@@ -115,6 +115,7 @@ export default class Camera {
     }
 
     loop = () => {
+        Matter.Engine.update(this.app.matter.engine, 1000 / 60);
         this.begin();
         this.app.stats.begin();
         this.app.update();

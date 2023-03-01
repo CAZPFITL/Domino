@@ -18,18 +18,19 @@ export default class AppMethods {
     constructor(Game, verbose) {
         this.updateCallbacks = [];
         this.verbose = verbose;
-
         this.tools = Tools;
-
         this.log = new Log(this);
         this.state = new States(this, this, LOAD_ENGINE, [LOAD_ENGINE, LOAD_GAME, PLAY_GAME]);
         this.controls = new Controls(this);
         this.physics = new Physics(this);
+        this.matter = {
+            engine: Matter.Engine.create()
+        }
         this.factory = new Factory(this);
         this.gui = new Gui(this);
         this.camera = new Camera(this);
         this.gameSpeed = 1;
-        // External Components
+        // external Components
         // 0: fps, 1: ms, 2: mb, 3+: custom
         this.stats = new Stats();
         this.loadEngine(Game);

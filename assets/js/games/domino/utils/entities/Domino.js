@@ -5,82 +5,40 @@ export const dominoSize = {
     height: 80
 }
 
+const _default = [false,false]
+
 export default class Domino {
-    constructor({id = 0, app, size, coords, angle, rotationSpeed, value}) {
+    constructor({id = 0, app, size = _default, coords = _default, value}) {
+        const [x, y, width, height] = [
+            (coords[0] ? coords[0] : 400),
+            (coords[1] ? coords[1] : 200),
+            (size[0] ? size[0] : dominoSize.width),
+            (size[1] ? size[1] : dominoSize.height)
+        ];
+
         this.id = id;
+
         this.app = app;
-        this.size = size ? size : dominoSize;
-        this.coords = coords ? coords : {
-            x: 0,
-            y: 0
-        };
         this.isFliped = false;
+
         this.frameCounter = id;
-        this.angle = angle ?? 0;
-        this.rotationSpeed = rotationSpeed ?? 0.07;
         this.value = [...value];
-        this.no_update = false;
-        this.no_draw = false;
-        this.img = new Image((this.size.width), (this.size.height));
+        this.img = new Image(width, height);
         this.img.src = './assets/images/Fichas1.png';
-    }
 
+        this.body = Matter.Bodies.rectangle(x, y, width, height);
+        this.size = dominoSize
 
-    /**
-     * Draw and Update methods
-     */
-    shape() {
-        const rad = Math.hypot(this.size.width, this.size.height) / 2;
-        const alpha = Math.atan2(this.size.width, this.size.height);
-        return [
-            {
-                x: this.coords.x - Math.sin(this.angle - alpha) * rad,
-                y: this.coords.y - Math.cos(this.angle - alpha) * rad
-            },
-            {
-                x: this.coords.x - Math.sin(this.angle) * rad * 0.9,
-                y: this.coords.y - Math.cos(this.angle) * rad * 0.9
-            },
-            {
-                x: this.coords.x - Math.sin(this.angle + alpha) * rad,
-                y: this.coords.y - Math.cos(this.angle + alpha) * rad
-            },
-            {
-                x: this.coords.x - Math.sin(Math.PI + this.angle - alpha) * rad,
-                y: this.coords.y - Math.cos(Math.PI + this.angle - alpha) * rad
-            },
-            {
-                x: this.coords.x - Math.sin(Math.PI + this.angle + alpha) * rad,
-                y: this.coords.y - Math.cos(Math.PI + this.angle + alpha) * rad
-            }
-        ]
-    }
-
-    update() {
-        if (!this.no_update && this.app.game.state.state === PLAY || this.app.game.state.state === GAME_OVER) {
-            this.app.gui.get.createPolygon(this);
-        }
+        Matter.Composite.add(app.matter.engine.world, [this.body]);
     }
 
     draw() {
         if (!this.no_draw && this.app.game.state.state === PLAY || this.app.game.state.state === GAME_OVER) {
-            this.color = '#DDDDDD'
             if (this.isFliped) {
                 this.app.gui.get.drawPolygon(this.app.gui.ctx, this);
             } else {
                 this.app.gui.get.drawImage(this.app.gui.ctx, this, 400, 800);
             }
-            // (this.amount < this.initialSize) &&
-            // this.app.gui.get.bar({
-            //     ctx: this.app.gui.ctx,
-            //     x: this.coords.x - this.initialSize / 2,
-            //     y: this.coords.y - this.height * 1.3,
-            //     fillColor: 'red-green',
-            //     barColor: 'rgba(0,0,0,0.5)',
-            //     cap: this.initialSize,
-            //     fill: this.amount,
-            //     negative: false
-            // });
         }
     }
 }
