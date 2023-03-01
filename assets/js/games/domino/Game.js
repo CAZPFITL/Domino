@@ -17,7 +17,6 @@ export default class Domino {
         this.loadCallback = loadCallback;
         this.gui = new Gui(this.app, this);
         this.app.factory.addGameEntity(this.gui);
-        this.loadCache = false;
         this.flags = gameFlags;
         this.state = new States(app, this, 'LOAD_GAME_DATA', STATES);
         this.app.factory.addGameEntity(this);

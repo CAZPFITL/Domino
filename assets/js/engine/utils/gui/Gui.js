@@ -116,7 +116,6 @@ export default class Gui {
     }
 
     static drawPolygon(ctx, entity, type = 'fill') {
-        console.log(entity)
         if (entity.vertices.length < 1) return;
 
         ctx.beginPath();
