@@ -59,7 +59,7 @@ export default class Domino {
                 this.app.camera.zoom = this.app.camera.maxZoom;
                 this.state.setState('PLAY');
                this.loadCache = false
-            }, 500)
+            }, 1000)
             this.loadCache = true
         }
     }
