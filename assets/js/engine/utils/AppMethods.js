@@ -66,7 +66,7 @@ export default class AppMethods {
             }
         );
         //
-        // Matter.Composite.add(this.physics.world, this.physics.mouseConstraint);
+        Matter.Composite.add(this.physics.world, this.physics.mouseConstraint);
     }
 
     update() {
