@@ -15,6 +15,7 @@ export default class AppMethods {
         this.loadClasses()
         this.loadPhysics()
         this.loadGame(Game)
+        this.loadInteractions()
     }
 
     loadClasses(){
@@ -47,15 +48,6 @@ export default class AppMethods {
         this.physics = {engine: Matter.Engine.create()};
         // Load Physics World
         this.physics.world = this.physics.engine.world;
-        // Load Physics Mouse
-        this.physics.mouse = Matter.Mouse.create(this.gui.ctx.canvas);
-        this.physics.mouseConstraint = Matter.MouseConstraint.create(
-            this.physics.engine, {
-                mouse: Matter.Mouse.create(this.gui.ctx.canvas)
-            }
-        );
-
-        Matter.Composite.add(this.physics.world, this.physics.mouseConstraint);
     }
 
     loadGame(Game){
@@ -63,6 +55,18 @@ export default class AppMethods {
         this.game = new Game(this);
         this.game.useMusicBox && (this.musicBox = new MusicBox(this));
         this.state.setState('LOADED');
+    }
+
+    loadInteractions() {
+        // Load Physics Mouse
+        this.physics.mouse = Matter.Mouse.create(document.body);
+        this.physics.mouseConstraint = Matter.MouseConstraint.create(
+            this.physics.engine, {
+                mouse: this.physics.mouse
+            }
+        );
+        //
+        // Matter.Composite.add(this.physics.world, this.physics.mouseConstraint);
     }
 
     update() {
