@@ -41,9 +41,9 @@ export default class Domino {
         this.state.setState('MAIN_MENU');
         // update gravity to zero
         this.app.physics.engine.gravity = {
-            "x": 1,
+            "x": 0,
             "y": 0,
-            "scale": 0.0001
+            "scale": 0.01
         }
     }
 
