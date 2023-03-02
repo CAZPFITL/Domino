@@ -115,7 +115,6 @@ export default class Camera {
     }
 
     loop = () => {
-        Matter.Engine.update(this.app.matter.engine, 1000 / 60);
         this.begin();
         this.app.stats.begin();
         this.app.update();

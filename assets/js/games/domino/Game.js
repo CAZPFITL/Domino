@@ -15,8 +15,10 @@ export default class Domino {
         this.app = app;
         this.useMusicBox = false;
         this.loadCallback = loadCallback;
+
         this.gui = new Gui(this.app, this);
         this.app.factory.addGameEntity(this.gui);
+
         this.flags = gameFlags;
         this.state = new States(app, this, 'LOAD_GAME_DATA', STATES);
         this.app.factory.addGameEntity(this);
@@ -35,17 +37,14 @@ export default class Domino {
         this.useMusicBox && this.app.musicBox.autoplay();
         // load Controls listeners
         this.app.controls.addListeners();
-        // Run Load Callback From Engine
-        this.loadCallback();
         // Set State to LOAD_GAME_LEVEL
         this.state.setState('MAIN_MENU');
         // update gravity to zero
-        this.app.matter.engine.gravity = {
-            "x": 0,
+        this.app.physics.engine.gravity = {
+            "x": 1,
             "y": 0,
-            "scale": 0.001
+            "scale": 0.0001
         }
-
     }
 
     #loadGameLevel() {
@@ -56,13 +55,12 @@ export default class Domino {
                     game: this
                 })
                 this.app.camera.zoom = this.app.camera.maxZoom;
-                this.state.setState('PLAY');
+                this.state.setState('PLAY_GAME');
                this.loadCache = false
             }, 100)
             this.loadCache = true
         }
     }
-
 
     #restart() {
         this.app.factory.binnacle = {GameObjects: this.app.factory.binnacle.GameObjects};
@@ -75,13 +73,5 @@ export default class Domino {
     update() {
         (this.state.state === 'LOAD_GAME_DATA') && this.#loadData();
         (this.state.state === 'LOADING') && this.#loadGameLevel();
-        // // TODO CHANGE THIS - this monster is temporal
-        // if (
-        //     this.app.game.state.state === 'PLAY' &&
-        //     this.state.state !== 'GAME_OVER'
-        // ) {
-        //     this.app.game.state.setState('GAME_OVER');
-        //     (this.state.state === 'GAME_OVER') && this.#restart();
-        // }
     }
 }

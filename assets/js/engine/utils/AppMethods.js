@@ -8,53 +8,67 @@ import Physics from "./components/Physics.js";
 import Controls from "./components/Controls.js";
 import MusicBox from "./components/MusicBox.js";
 import Log from "./components/Log.js";
-import {
-    LOAD_ENGINE,
-    LOAD_GAME,
-    PLAY_GAME
-} from "../env.js";
 
 export default class AppMethods {
     constructor(Game, verbose) {
-        this.updateCallbacks = [];
-        this.verbose = verbose;
-        this.tools = Tools;
-        this.log = new Log(this);
-        this.state = new States(this, this, LOAD_ENGINE, [LOAD_ENGINE, LOAD_GAME, PLAY_GAME]);
-        this.controls = new Controls(this);
-        this.physics = new Physics(this);
-        this.matter = {
-            engine: Matter.Engine.create()
-        }
-        this.factory = new Factory(this);
-        this.gui = new Gui(this);
-        this.camera = new Camera(this);
-        this.gameSpeed = 1;
-        // external Components
-        // 0: fps, 1: ms, 2: mb, 3+: custom
-        this.stats = new Stats();
-        this.loadEngine(Game);
-        this.game.useMusicBox && (this.musicBox = new MusicBox(this));
-    }
-
-    loadEngine(Game, verbose = false) {
-        !verbose && this.toggleStats();
-        document.body.appendChild(this.stats.dom);
-        this.request = requestAnimationFrame(this.camera.loop);
+        this.loadStats(verbose)
+        this.loadClasses()
+        this.loadPhysics()
         this.loadGame(Game)
     }
 
-    toggleStats() {
-        this.stats.isShowing = !this.stats.isShowing;
-        this.stats.dom.style.display = this.stats.isShowing ? 'block' : 'none';
+    loadClasses(){
+        this.updateCallbacks = [];
+        this.gameSpeed = 1;
+        this.tools = Tools;
+        this.log = new Log(this);
+        this.state = new States(this, this, 'LOAD_ENGINE', ['LOAD_ENGINE', 'LOAD_GAME', 'LOADED']);
+        this.controls = new Controls(this);
+        this.factory = new Factory(this);
+        this.gui = new Gui(this);
+        this.camera = new Camera(this);
+        this.request = requestAnimationFrame(this.camera.loop);
     }
 
-    loadGame(Game) {
-        this.state.setState(LOAD_GAME);
-        this.game = new Game(this, () => this.state.setState(PLAY_GAME));
+    loadStats(verbose){
+        this.verbose = verbose
+        this.stats = new Stats();
+        // load Stats
+        !verbose && (()=> {
+            this.stats.isShowing = !this.stats.isShowing;
+            this.stats.dom.style.display = this.stats.isShowing ? 'block' : 'none';
+            document.body.appendChild(this.stats.dom);
+        })()
+    }
+
+    loadPhysics(){
+        // Load Physics Engine
+        //     this.physics = new Physics(this);
+        this.physics = {engine: Matter.Engine.create()};
+        // Load Physics World
+        this.physics.world = this.physics.engine.world;
+        // Load Physics Mouse
+        this.physics.mouse = Matter.Mouse.create(this.gui.ctx.canvas);
+        this.physics.mouseConstraint = Matter.MouseConstraint.create(
+            this.physics.engine, {
+                mouse: Matter.Mouse.create(this.gui.ctx.canvas)
+            }
+        );
+
+        Matter.Composite.add(this.physics.world, this.physics.mouseConstraint);
+    }
+
+    loadGame(Game){
+        this.state.setState('LOAD_GAME');
+        this.game = new Game(this);
+        this.game.useMusicBox && (this.musicBox = new MusicBox(this));
+        this.state.setState('LOADED');
     }
 
     update() {
+        // Update Physics Engine
+        Matter.Engine.update(this.physics.engine, 1000 / 60);
+        // Update Entities
         for (let key in this.factory.binnacle) {
             if (this.factory.binnacle[key] instanceof Array) {
                 for (let i = 0; i < this.factory.binnacle[key].length; i++) {

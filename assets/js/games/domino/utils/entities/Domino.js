@@ -1,4 +1,4 @@
-import {GAME_OVER, PLAY} from "../../env.js";
+import {GAME_OVER, PLAY_GAME} from "../../env.js";
 
 export const dominoSize = {
     width: 40,
@@ -29,11 +29,11 @@ export default class Domino {
         this.body = Matter.Bodies.rectangle(x, y, width, height, {angle: Math.random() * 8});
         this.size = {width, height}
 
-        Matter.Composite.add(app.matter.engine.world, [this.body]);
+        Matter.Composite.add(app.physics.world, [this.body]);
     }
 
     draw() {
-        if (!this.no_draw && this.app.game.state.state === PLAY || this.app.game.state.state === GAME_OVER) {
+        if (!this.no_draw && this.app.game.state.state === PLAY_GAME || this.app.game.state.state === GAME_OVER) {
             if (this.isFliped) {
                 this.app.gui.get.drawPolygon(this.app.gui.ctx, this);
             } else {

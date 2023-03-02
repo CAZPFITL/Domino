@@ -1,4 +1,4 @@
-import {GAME_OVER, PLAY} from "../../env.js";
+import {GAME_OVER, PLAY_GAME} from "../../env.js";
 import Domino, {dominoSize} from '../entities/Domino.js'
 import Board from '../entities/Board.js'
 
@@ -22,7 +22,6 @@ export default class GameLevel {
         ];
         this.load('entities');
         this.app.factory.addGameEntity(this);
-
     }
 
     /**
@@ -79,7 +78,7 @@ export default class GameLevel {
      * Draw and Update methods
      */
     draw() {
-        if (this.app.game.state.state === PLAY ||
+        if (this.app.game.state.state === PLAY_GAME ||
             this.app.game.state.state === GAME_OVER) {
             // TODO change this to get the level
             // this.app.gui.ctx.fillStyle = this.color;
