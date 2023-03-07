@@ -13,6 +13,11 @@ export default class GameLevel {
         }
         this.loadEntitiesList = [
             ...this.getDominoes(),
+            ...this.getDominoes(),
+            ...this.getDominoes(),
+            ...this.getDominoes(),
+            ...this.getDominoes(),
+            ...this.getDominoes(),
             {
                 name: 'Board',
                 props: {
