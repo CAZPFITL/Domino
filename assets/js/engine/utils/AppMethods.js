@@ -71,19 +71,13 @@ export default class AppMethods {
 
         Matter.Composite.add(this.physics.world, this.physics.mouseConstraint);
 
-        const updateMousePosition = (e) =>
-            console.log('e')
+        const updateMousePosition = () => {
             this.physics.mouse.position = this.gui.get.viewportCoords(this.physics.mouse.position, this.camera.viewport);
+            this.physics.mouse.mousedownPosition = this.gui.get.viewportCoords(this.physics.mouse.position, this.camera.viewport);
+            this.physics.mouse.mouseupPosition   = this.gui.get.viewportCoords(this.physics.mouse.position, this.camera.viewport);
+        }
 
-        // Matter.Events.on(this.physics.engine, "beforeUpdate", (e)=>{
-        //     console.log(e)
-        //     e.source.events.beforeUpdate
-        // })
-        // Matter.Mouse.setScale(this.physics.mouse, scale)
-        // Matter.Mouse.setOffset(this.physics.mouse, translation)
-        Matter.Events.on(this.physics.mouseConstraint, "startdrag", updateMousePosition)
         Matter.Events.on(this.physics.mouseConstraint, "mousemove", updateMousePosition)
-        Matter.Events.on(this.physics.mouseConstraint, "enddrag", updateMousePosition)
         Matter.Events.on(this.physics.mouseConstraint, "mouseup", updateMousePosition)
         Matter.Events.on(this.physics.mouseConstraint, "mousedown", updateMousePosition)
         Matter.Events.on(this.physics.engine, "afterUpdate", (e)=>{
