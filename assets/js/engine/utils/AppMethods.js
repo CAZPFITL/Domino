@@ -58,7 +58,7 @@ export default class AppMethods {
     }
 
     loadInteractions() {
-        this.physics.mouse = Matter.Mouse.create(this.game?.gui.controlsCtx.canvas);
+        this.physics.mouse = Matter.Mouse.create(document.body);
         this.physics.mouseConstraint = Matter.MouseConstraint.create(
             this.physics.engine, {
                 mouse: this.physics.mouse,
@@ -80,10 +80,14 @@ export default class AppMethods {
         Matter.Events.on(this.physics.mouseConstraint, "mousemove", updateMousePosition)
         Matter.Events.on(this.physics.mouseConstraint, "mouseup", updateMousePosition)
         Matter.Events.on(this.physics.mouseConstraint, "mousedown", updateMousePosition)
-        Matter.Events.on(this.physics.engine, "afterUpdate", (e)=>{
-            // Matter.Mouse.setScale(this.physics.mouse, this.camera.viewport.scale)
-            // Matter.Mouse.setOffset(this.physics.mouse, translation)
-        })
+        // Matter.Events.on(this.physics.engine, "afterUpdate", updateMousePosition)
+        // Matter.Events.on(this.physics.engine, "afterUpdate", (e)=>{
+        //     Matter.Mouse.setOffset(this.physics.mouse, {
+        //         x: this.camera.viewport.left,
+        //         y: this.camera.viewport.top
+        //     })
+        //     Matter.Mouse.setScale(this.physics.mouse, this.camera.viewport.scale)
+        // })
     }
 
     update() {

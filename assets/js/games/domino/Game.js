@@ -43,7 +43,7 @@ export default class Domino {
         this.app.physics.engine.gravity = {
             "x": 0,
             "y": 0,
-            "scale": 0.01
+            "scale": 0.1
         }
     }
 

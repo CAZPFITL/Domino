@@ -25,13 +25,21 @@ export default class Board {
 
         this.size = {width, height};
 
-        const weight = 20;
+        const weight = 5;
+
+        const options = {
+            isStatic: true,
+            density: 100,
+            mass: 100,
+            friction: 1,
+            restitution: 1,
+        }
 
         this.bodyParts = [
-            Matter.Bodies.rectangle(0, y, width, weight, {isStatic: true, density: 100, mass: 100}),
-            Matter.Bodies.rectangle(0, -y, width, weight, {isStatic: true, density: 100, mass: 100}),
-            Matter.Bodies.rectangle(x, 0, weight, height, {isStatic: true, density: 100, mass: 100}),
-            Matter.Bodies.rectangle(-x, 0,  weight, height, {isStatic: true, density: 100, mass: 100}),
+            Matter.Bodies.rectangle(0, y, width, weight, options),
+            Matter.Bodies.rectangle(0, -y, width, weight, options),
+            Matter.Bodies.rectangle(x, 0, weight, height, options),
+            Matter.Bodies.rectangle(-x, 0, weight, height, options),
         ]
 
         Matter.Composite.add(app.physics.world, this.bodyParts);
@@ -43,7 +51,7 @@ export default class Board {
             const context = this.app.gui.ctx;
             // this.app.gui.get.drawImage(this.app.gui.ctx, this, 1500, 1500);
             for (let i = 0; i < bodies.length; i += 1) {
-                context.lineWidth = 20;
+                context.lineWidth = 10;
                 context.strokeStyle = '#999';
                 this.app.gui.get.drawPolygon(context, bodies[i], 'stroke');
                 context.lineWidth = 1;

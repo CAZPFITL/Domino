@@ -24,9 +24,17 @@ export default class Domino {
         this.frameCounter = id;
         this.value = [...value];
         this.img = new Image(width, height);
-        this.img.src = './assets/images/Fichas1.png';
+        this.img.src = './assets/images/Fichas4.png';
 
-        this.body = Matter.Bodies.rectangle(x, y, width, height, {angle: Math.random() * 8});
+        const options = {
+            frictionStatic: 10,
+            frictionAir: 10,
+            friction: 10,
+            density: 10,
+            mass: 10
+        }
+
+        this.body = Matter.Bodies.rectangle(x, y, width, height, {angle: Math.random() * 8}, options);
         this.size = {width, height}
 
         Matter.Composite.add(app.physics.world, [this.body]);
