@@ -33,7 +33,7 @@ export default class Domino {
     }
 
     draw() {
-        if (!this.no_draw && this.app.game.state.state === PLAY_GAME || this.app.game.state.state === GAME_OVER) {
+        if (this.app.game.state.state === PLAY_GAME || this.app.game.state.state === GAME_OVER) {
             if (this.isFliped) {
                 this.app.gui.get.drawPolygon(this.app.gui.ctx, this);
             } else {

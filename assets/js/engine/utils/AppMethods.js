@@ -14,8 +14,8 @@ export default class AppMethods {
         this.loadStats(verbose)
         this.loadClasses()
         this.loadPhysics()
-        this.loadGame(Game)
         this.loadInteractions()
+        this.loadGame(Game)
     }
 
     loadClasses(){
@@ -58,21 +58,42 @@ export default class AppMethods {
     }
 
     loadInteractions() {
-        // Load Physics Mouse
-        this.physics.mouse = Matter.Mouse.create(document.body);
+        this.physics.mouse = Matter.Mouse.create(this.game?.gui.controlsCtx.canvas);
         this.physics.mouseConstraint = Matter.MouseConstraint.create(
             this.physics.engine, {
-                mouse: this.physics.mouse
+                mouse: this.physics.mouse,
+                stiffness: 0.2,
+                render: {
+                    visible: false
+                }
             }
         );
-        //
+
         Matter.Composite.add(this.physics.world, this.physics.mouseConstraint);
+
+        const updateMousePosition = (e) =>
+            console.log('e')
+            this.physics.mouse.position = this.gui.get.viewportCoords(this.physics.mouse.position, this.camera.viewport);
+
+        // Matter.Events.on(this.physics.engine, "beforeUpdate", (e)=>{
+        //     console.log(e)
+        //     e.source.events.beforeUpdate
+        // })
+        // Matter.Mouse.setScale(this.physics.mouse, scale)
+        // Matter.Mouse.setOffset(this.physics.mouse, translation)
+        Matter.Events.on(this.physics.mouseConstraint, "startdrag", updateMousePosition)
+        Matter.Events.on(this.physics.mouseConstraint, "mousemove", updateMousePosition)
+        Matter.Events.on(this.physics.mouseConstraint, "enddrag", updateMousePosition)
+        Matter.Events.on(this.physics.mouseConstraint, "mouseup", updateMousePosition)
+        Matter.Events.on(this.physics.mouseConstraint, "mousedown", updateMousePosition)
+        Matter.Events.on(this.physics.engine, "afterUpdate", (e)=>{
+            // Matter.Mouse.setScale(this.physics.mouse, this.camera.viewport.scale)
+            // Matter.Mouse.setOffset(this.physics.mouse, translation)
+        })
     }
 
     update() {
-        // Update Physics Engine
         Matter.Engine.update(this.physics.engine, 1000 / 60);
-        // Update Entities
         for (let key in this.factory.binnacle) {
             if (this.factory.binnacle[key] instanceof Array) {
                 for (let i = 0; i < this.factory.binnacle[key].length; i++) {

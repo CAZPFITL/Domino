@@ -21,15 +21,17 @@ export default class Board {
         this.body = {
             position: {x, y},
             angle: 0
-        }
+        };
 
-        this.size = {width, height}
+        this.size = {width, height};
+
+        const weight = 20;
 
         this.bodyParts = [
-            Matter.Bodies.rectangle(0, y, width, 20, {isStatic: true}),
-            Matter.Bodies.rectangle(0, -y, width, 20, {isStatic: true}),
-            Matter.Bodies.rectangle(x, 0, 20, height, {isStatic: true}),
-            Matter.Bodies.rectangle(-x, 0, 20, height, {isStatic: true}),
+            Matter.Bodies.rectangle(0, y, width, weight, {isStatic: true, density: 100, mass: 100}),
+            Matter.Bodies.rectangle(0, -y, width, weight, {isStatic: true, density: 100, mass: 100}),
+            Matter.Bodies.rectangle(x, 0, weight, height, {isStatic: true, density: 100, mass: 100}),
+            Matter.Bodies.rectangle(-x, 0,  weight, height, {isStatic: true, density: 100, mass: 100}),
         ]
 
         Matter.Composite.add(app.physics.world, this.bodyParts);

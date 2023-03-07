@@ -44,13 +44,13 @@ export default class Gui {
     }
 
     static viewportCoords = ({x, y}, viewport) => ({
-        x: x / viewport.scale[0] + viewport.left,
-        y: y / viewport.scale[1] + viewport.top
+        x: x / viewport.scale.x + viewport.left,
+        y: y / viewport.scale.y + viewport.top
     })
 
     static clickCoords = (e, viewport) => ({
-        x: e.clientX / viewport.scale[0] + viewport.left,
-        y: e.clientY / viewport.scale[1] + viewport.top
+        x: e.clientX / viewport.scale.x + viewport.left,
+        y: e.clientY / viewport.scale.y + viewport.top
     })
 
     static entityAt(click, collection) {
