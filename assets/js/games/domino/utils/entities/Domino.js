@@ -27,11 +27,11 @@ export default class Domino {
         this.img.src = './assets/images/Fichas4.png';
 
         const options = {
-            frictionStatic: 10,
-            frictionAir: 10,
-            friction: 10,
-            density: 10,
-            mass: 10
+            frictionStatic: 0.010,
+            frictionAir: 0.010,
+            friction: 0.010,
+            density: 0.010,
+            mass: 0.010
         }
 
         this.body = Matter.Bodies.rectangle(x, y, width, height, {angle: Math.random() * 8}, options);

@@ -10,44 +10,23 @@ export default class Screen {
         this.decorations = {};
         this.buttonsStates = {};
         this.buttonsCollection = {};
-        this.abstractStates = {};
+        this.abstractStates = {
+            bodyToDrag: false
+        };
         this.screenData = () => this.declareElements();
         this.addListeners({
             mousemove: (event, hoverTranslatedCoords) => {
-                // MOVE CREATION
-                if (this.abstractStates.creating) {
-                    if (this.creation?.coords) {
-                        (this.creation.coords = hoverTranslatedCoords);
-                    } else {
-                        this.creation.x = hoverTranslatedCoords?.x;
-                        this.creation.y = hoverTranslatedCoords?.y;
-                    }
+                // MOVE Domino
+                if (this.abstractStates.bodyToDrag) {
+                    const body = this.abstractStates.bodyToDrag.body;
+                    (body.position = hoverTranslatedCoords);
                 }
             },
-            mouseup: () => true,
-            mousedown: (event) => {
-                // PLACE CREATION
-                if (this.abstractStates.creating) {
-                    const safeGap = 20;
-                    const objWidth = (this.creation?.size?.width ?? this.creation.width);
-                    const objHeight = (this.creation?.size?.height ?? this.creation.height);
-                    const map = {
-                        x: (-this.app.game.level.size.width + objWidth) / 2 + safeGap,
-                        y: (-this.app.game.level.size.height + objHeight) / 2 + safeGap,
-                        width: this.app.game.level.size.width - objWidth - safeGap * 2,
-                        height: this.app.game.level.size.height - objHeight - safeGap * 2
-                    }
-                    const click = this.app.gui.get.viewportCoords(
-                        {x: event.offsetX, y: event.offsetY},
-                        this.app.camera.viewport
-                    );
-                    if (this.app.gui.get.isHover(map, click)) {
-                        this.creation = null;
-                        this.abstractStates.creating = false;
-                        this.buttonsStates.createAnthill = 'normal';
-                        this.buttonsStates.createFood = 'normal';
-                    }
-                }
+            mouseup: () => {
+                this.abstractStates.bodyToDrag = false;
+            },
+            mousedown: (event, hoverTranslatedCoords) => {
+                this.abstractStates.bodyToDrag = this.app.gui.get.entityAt(hoverTranslatedCoords, this.app.factory.binnacle?.Domino) ?? false
             },
             click: () => true,
         });
@@ -235,23 +214,15 @@ export default class Screen {
         };
     }
 
-    addListeners(abstractEvents) {
-        this.app.controls.pushListener(this, 'mousemove', (event) => {
-            const buttons = this.getButtons()
-            const hoverTranslatedCoords = this.app.gui.get.viewportCoords({
-                x: event.offsetX,
-                y: event.offsetY
-            }, this.app.camera.viewport);
+    buttonCollectionEvents(type, hoverTranslatedCoords) {
+        const buttons = this.getButtons()
 
-            // this.app.player.anthill.target = hoverTranslatedCoords;
-
-            // ABSTRACT MOVE
-            abstractEvents.mousemove(event, hoverTranslatedCoords);
-            // MOUSE MOVE
-            Object.keys(buttons).forEach((key) =>
+        if (type === 'mousemove') {
+            Object.keys(buttons).forEach((key) => {
                 buttons[key].props?.callbacks?.mousemove &&
-                buttons[key].props.callbacks.mousemove(event, hoverTranslatedCoords));
-            // HOVER READ
+                buttons[key].props.callbacks.mousemove(event, hoverTranslatedCoords)
+            });
+
             this.app.gui.get.checkHoverCollection({
                 collection: this.hoverCollection,
                 event,
@@ -272,9 +243,9 @@ export default class Screen {
                 },
                 caller: this.hoverCaller,
             });
-        });
-        this.app.controls.pushListener(this, 'mouseup', (event) => {
-            const buttons = this.getButtons()
+        }
+
+        if (type === 'mouseup') {
             Object.keys(buttons).forEach((key) => {
                 const ctx = buttons[key].props.position === 'viewport'
                     ? this.app.gui.get.clickCoords(event, this.app.camera.viewport)
@@ -286,11 +257,10 @@ export default class Screen {
                     () => buttons[key].props?.callbacks?.mouseup && buttons[key].props.callbacks.mouseup(event)
                 )
             });
-            abstractEvents.mouseup(event);
-        });
-        this.app.controls.pushListener(this, 'mousedown', (event) => {
-            const buttons = this.getButtons()
+        }
 
+        if (type === 'mousedown') {
+            const buttons = this.getButtons()
             Object.keys(buttons).forEach((key) => {
                 if (!buttons[key].props?.ctx) return;
                 const ctx = buttons[key].props.position === 'viewport'
@@ -303,9 +273,9 @@ export default class Screen {
                     () => buttons[key].props?.callbacks?.mousedown && buttons[key].props.callbacks.mousedown(event)
                 )
             });
-            abstractEvents.mousedown(event);
-        });
-        this.app.controls.pushListener(this, 'click', (event) => {
+        }
+
+        if (type === 'click') {
             const buttons = this.getButtons()
 
             Object.keys(buttons).forEach((key) => {
@@ -319,9 +289,39 @@ export default class Screen {
                     () => buttons[key].props?.callbacks?.click && buttons[key].props.callbacks.click(event)
                 )
             });
+        }
+    }
 
-            abstractEvents.click(event);
+    addListeners(abstractEvents) {
+        const translatedCoords = (event) => (this.app.gui.get.viewportCoords({
+            x: event.offsetX,
+            y: event.offsetY
+        }, this.app.camera.viewport));
+
+        this.app.controls.pushListener(this, 'mousemove', (event) => {
+            const tc = translatedCoords(event);
+            abstractEvents.mousemove(event, tc);
+            this.buttonCollectionEvents('mousemove', tc);
         });
+
+        this.app.controls.pushListener(this, 'mouseup', (event) => {
+            const tc = translatedCoords(event);
+            abstractEvents.mouseup(event, tc);
+            this.buttonCollectionEvents('mouseup', tc);
+        });
+
+        this.app.controls.pushListener(this, 'mousedown', (event) => {
+            const tc = translatedCoords(event);
+            abstractEvents.mousedown(event, tc);
+            this.buttonCollectionEvents('mousedown', tc);
+        });
+
+        this.app.controls.pushListener(this, 'click', (event) => {
+            const tc = translatedCoords(event);
+            abstractEvents.click(event, tc);
+            this.buttonCollectionEvents('click', tc);
+        });
+
     }
 
     getButtons() {

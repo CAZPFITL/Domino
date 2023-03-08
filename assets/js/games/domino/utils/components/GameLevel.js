@@ -13,11 +13,6 @@ export default class GameLevel {
         }
         this.loadEntitiesList = [
             ...this.getDominoes(),
-            ...this.getDominoes(),
-            ...this.getDominoes(),
-            ...this.getDominoes(),
-            ...this.getDominoes(),
-            ...this.getDominoes(),
             {
                 name: 'Board',
                 props: {
@@ -85,9 +80,6 @@ export default class GameLevel {
     draw() {
         if (this.app.game.state.state === PLAY_GAME ||
             this.app.game.state.state === GAME_OVER) {
-            // TODO change this to get the level
-            // this.app.gui.ctx.fillStyle = this.color;
-            // this.app.gui.ctx.fillRect(this.coords.x, this.coords.y, this.size.width, this.size.height);
         }
     }
 }

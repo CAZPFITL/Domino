@@ -58,8 +58,8 @@ export default class Gui {
         for (let i = 0; i < collection.length; i++) {
             const entity = collection[i];
 
-            if (entity.polygons instanceof Array) {
-                const polysIntersect = Gui.isPointInsidePolygon(click, entity.polygons);
+            if (entity.body.vertices instanceof Array) {
+                const polysIntersect = Gui.isPointInsidePolygon(click, entity.body.vertices);
                 if (polysIntersect)
                     return entity;
             }
