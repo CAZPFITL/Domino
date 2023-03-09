@@ -14,35 +14,6 @@ export default class Gui {
         });
     }
 
-    /**
-     * Static
-     */
-    static createCanvas(id) {
-        const canvas = document.getElementById(id);
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        return canvas.getContext('2d');
-    }
-
-    static isClicked(entity, click, callback) {
-        if (!entity) return;
-        const {x, y, width, height} = entity;
-        if (click.x > x && click.x < x + width && click.y > y && click.y < y + height) {
-            callback();
-        }
-    }
-
-    static isHover(entity, click) {
-        if (!entity) return;
-        const {x, y, width, height} = entity;
-        return (
-          click.x > x &&
-          click.x < x + width &&
-          click.y > y &&
-          click.y < y + height
-        );
-    }
-
     static viewportCoords = ({x, y}, viewport) => ({
         x: x / viewport.scale.x + viewport.left,
         y: y / viewport.scale.y + viewport.top
@@ -52,19 +23,6 @@ export default class Gui {
         x: e.clientX / viewport.scale.x + viewport.left,
         y: e.clientY / viewport.scale.y + viewport.top
     })
-
-    static entityAt(click, collection) {
-        if (!collection) return;
-        for (let i = 0; i < collection.length; i++) {
-            const entity = collection[i];
-
-            if (entity.body.vertices instanceof Array) {
-                const polysIntersect = Gui.isPointInsidePolygon(click, entity.body.vertices);
-                if (polysIntersect)
-                    return entity;
-            }
-        }
-    }
 
     static isPointInsidePolygon = (point, polygon) => {
         let isInside = false;
@@ -86,13 +44,39 @@ export default class Gui {
         return isInside;
     }
 
+    static createCanvas(id) {
+        const canvas = document.getElementById(id);
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        return canvas.getContext('2d');
+    }
+
+    static isClicked(entity, click, callback) {
+        if (!entity) return;
+        const {x, y, width, height} = entity;
+        if (click.x > x && click.x < x + width && click.y > y && click.y < y + height) {
+            callback();
+        }
+    }
+
+    static isHover(entity, click) {
+        if (!entity) return;
+        const {x, y, width, height} = entity;
+        return (
+            click.x > x &&
+            click.x < x + width &&
+            click.y > y &&
+            click.y < y + height
+        );
+    }
+
     static checkHoverCollection({collection, event, viewport, isHover, isOut, caller}) {
         for (const key in collection) {
             if (collection[key]?.position === 'viewport' &&
-              Gui.isHover(collection[key], Gui.viewportCoords(event, viewport))) {
+                Gui.isHover(collection[key], Gui.viewportCoords(event, viewport))) {
                 isHover(key);
             } else if (collection[key]?.position === 'controls' &&
-              Gui.isHover(collection[key], {x: event.clientX, y: event.clientY})) {
+                Gui.isHover(collection[key], {x: event.clientX, y: event.clientY})) {
                 isHover(key);
             } else {
                 if (caller === key) {
@@ -102,17 +86,17 @@ export default class Gui {
         }
     }
 
-    static createPolygon(entity) {
-        const shape = entity.shape();
-        if (shape.length < 1) return;
-        const points = [];
-        for (let i = 0; i < shape.length; i++) {
-            points.push({
-                x: shape[i].x,
-                y: shape[i].y
-            });
+    static entityAt(click, collection) {
+        if (!collection) return;
+        for (let i = 0; i < collection.length; i++) {
+            const entity = collection[i];
+
+            if (entity.vertices instanceof Array) {
+                const polysIntersect = Gui.isPointInsidePolygon(click, entity.vertices);
+                if (polysIntersect)
+                    return entity;
+            }
         }
-        entity.polygons = points;
     }
 
     static drawPolygon(ctx, entity, type = 'fill') {
@@ -137,47 +121,27 @@ export default class Gui {
         ctx.rotate(-entity.body.angle);
 
         ctx.drawImage(
-          entity.img,
-          width * entity.frameCounter,
-          0,
-          width,
-          height,
-          -entity.size.width / 2,
-          -entity.size.height / 2,
-          entity.size.width,
-          entity.size.height,
+            entity.img,
+            width * entity.frameCounter,
+            0,
+            width,
+            height,
+            -entity.size.width / 2,
+            -entity.size.height / 2,
+            entity.size.width,
+            entity.size.height,
         );
 
         ctx.restore();
     }
 
-    static polysIntersect(poly1, poly2) {
-        for (let i = 0; i < poly1.length; i++) {
-            for (let j = 0; j < poly2.length; j++) {
-                const touch = Tools.getIntersection(
-                  poly1[i],
-                  poly1[(i + 1) % poly1.length],
-                  poly2[j],
-                  poly2[(j + 1) % poly2.length],
-                )
-                if (touch) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Screen instantiable objects
-     */
     static button({
                       ctx,
-                      font,
                       x,
                       y,
                       width,
                       height,
+                      font,
                       text,
                       bg = '#ffffff',
                       color = '#000',
@@ -212,41 +176,32 @@ export default class Gui {
         return ctx.measureText(text).width;
     }
 
-    static bar({
-                   ctx,
-                   x,
-                   y,
-                   text,
-                   cap,
-                   fill,
-                   height = 10,
-                   fillColor,
-                   barColor = 'transparent',
-                   stroke,
-                   negative = false
-               }) {
-        const normalizedProgress = fill / (cap / 255);
-        const progress = negative ? (cap - fill) : fill
-
-        ctx.fillStyle = barColor;
-        ctx.fillRect(x, y, cap, height);
-        stroke && (ctx.strokeStyle = stroke);
-        stroke && (ctx.strokeRect(x, y, cap, height));
-
-        ctx.fillStyle = fillColor === 'green-red' ?
-          `rgb(${normalizedProgress}, ${255 - normalizedProgress}, 0)` :
-          'red-green' ? `rgb(${255 - normalizedProgress}, ${normalizedProgress}, 0)` : fillColor;
-        ctx.fillRect(x, y, progress, height);
-
-
-        text && (this.text({ctx, font: '12px Mouse', color: '#000', text, x, y: y - height}));
-    }
-
     static line({ctx, x1, y1, x2, y2, color = '#000'}) {
         ctx.beginPath();
         ctx.moveTo(x1, y1);
         ctx.lineTo(x2, y2);
         ctx.strokeStyle = color;
+        ctx.stroke();
+    }
+
+    /**
+     * PLANCKJS HELPERS
+     */
+    static drawPlPolygon(ctx, entity, color="#c700ff") {
+        let points = entity.vertices;
+
+        if (!points || !points.length) {
+            return;
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(points[0].x + entity.position.c.x, points[0].y - entity.position.c.y);
+        for (let i = 1; i < points.length; i++) {
+            ctx.lineTo(points[i].x + entity.position.c.x, points[i].y - entity.position.c.y);
+        }
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 5;
+        ctx.closePath();
         ctx.stroke();
     }
 }

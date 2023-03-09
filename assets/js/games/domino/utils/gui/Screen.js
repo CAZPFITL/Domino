@@ -18,8 +18,7 @@ export default class Screen {
             mousemove: (event, hoverTranslatedCoords) => {
                 // MOVE Domino
                 if (this.abstractStates.bodyToDrag) {
-                    const body = this.abstractStates.bodyToDrag.body;
-                    (body.position = hoverTranslatedCoords);
+                    this.abstractStates.bodyToDrag.position.c = hoverTranslatedCoords;
                 }
             },
             mouseup: () => {

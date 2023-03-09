@@ -48,7 +48,7 @@ export default class GameLevel {
     /*
      * Game methods
      */
-    getDominoes(base = [1, 2, 3, 4, 5, 6]) {
+    getDominoes(base = [1]) {
         const output = [];
         let idCounter = 0;
         base.forEach((a) => {
