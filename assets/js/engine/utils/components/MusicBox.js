@@ -1,10 +1,9 @@
 import States from "../patterns/State.js";
-import {STOP, PLAY, PAUSE} from "../../env.js";
 
 export default class MusicBox {
     constructor(app, callback = (fn) => fn()) {
         this.app = app;
-        this.state = new States(app, this, STOP, [PLAY, PAUSE, STOP]);
+        this.state = new States(app, this, 'STOP_MUSIC', ['PLAY_MUSIC', 'PAUSE_MUSIC', 'STOP_MUSIC']);
         this.song = null;
         this.volume = 1;
         this.songs = [];
@@ -58,7 +57,7 @@ export default class MusicBox {
                 console.error(err);
             })
             .then(() => {
-                this.state.setState(PLAY);
+                this.state.setState(PLAY_MUSIC);
                 this.app.log.registerEvent(
                     `Now playing ${this.song.name}`,
                     `\x1b[35;1m| \x1b[0mNow playing ${this.song.name}`
@@ -86,7 +85,7 @@ export default class MusicBox {
     }
 
     toggle() {
-        this.state.setState(this.song.paused ? PLAY : PAUSE);
-        this.state.state === PLAY ? this.song.play() : this.song.pause();
+        this.state.setState(this.song.paused ? PLAY_MUSIC : PAUSE_MUSIC);
+        this.state.state === PLAY_MUSIC ? this.song.play() : this.song.pause();
     }
 }

@@ -1,55 +1,32 @@
-import ScreenHelpers from '../../../../engine/utils/gui/ScreenHelpers.js'
 import {
     COLORS
 } from "../../env.js";
 
-export default class Screen extends ScreenHelpers {
+export default class Screen {
     constructor(app, gui) {
-        super()
         this.app = app;
         this.gui = gui;
         this.hoverCollection = {};
         this.decorations = {};
         this.buttonsStates = {};
         this.buttonsCollection = {};
-        this.abstractStates = {};
+        this.abstractStates = {
+            bodyToDrag: false
+        };
         this.screenData = () => this.declareElements();
         this.addListeners({
             mousemove: (event, hoverTranslatedCoords) => {
-                // MOVE CREATION
-                if (this.abstractStates.creating) {
-                    if (this.creation?.coords) {
-                        (this.creation.coords = hoverTranslatedCoords);
-                    } else {
-                        this.creation.x = hoverTranslatedCoords?.x;
-                        this.creation.y = hoverTranslatedCoords?.y;
-                    }
+                // MOVE Domino
+                if (this.abstractStates.bodyToDrag) {
+                    const body = this.abstractStates.bodyToDrag.body;
+                    (body.position = hoverTranslatedCoords);
                 }
             },
-            mouseup: () => true,
-            mousedown: (event) => {
-                // PLACE CREATION
-                if (this.abstractStates.creating) {
-                    const safeGap = 20;
-                    const objWidth = (this.creation?.size?.width ?? this.creation.width);
-                    const objHeight = (this.creation?.size?.height ?? this.creation.height);
-                    const map = {
-                        x: (-this.app.game.level.size.width + objWidth) / 2 + safeGap,
-                        y: (-this.app.game.level.size.height + objHeight) / 2 + safeGap,
-                        width: this.app.game.level.size.width - objWidth - safeGap * 2,
-                        height: this.app.game.level.size.height - objHeight - safeGap * 2
-                    }
-                    const click = this.app.gui.get.viewportCoords(
-                        {x: event.offsetX, y: event.offsetY},
-                        this.app.camera.viewport
-                    );
-                    if (this.app.gui.get.isHover(map, click)) {
-                        this.creation = null;
-                        this.abstractStates.creating = false;
-                        this.buttonsStates.createAnthill = 'normal';
-                        this.buttonsStates.createFood = 'normal';
-                    }
-                }
+            mouseup: () => {
+                this.abstractStates.bodyToDrag = false;
+            },
+            mousedown: (event, hoverTranslatedCoords) => {
+                this.abstractStates.bodyToDrag = this.app.gui.get.entityAt(hoverTranslatedCoords, this.app.factory.binnacle?.Domino) ?? false
             },
             click: () => true,
         });
@@ -75,7 +52,7 @@ export default class Screen extends ScreenHelpers {
                 }
             },
             PLAY: {
-                background: COLORS.GREEN[0],
+                background: '#a7b2b7',
             }
         };
 
@@ -96,11 +73,11 @@ export default class Screen extends ScreenHelpers {
             height: 300,
         };
 
-        const height = 190;
-
-        const width = 400;
-
-        const cardPosition = {x: 10, y: 10};
+        // const height = 190;
+        //
+        // const width = 400;
+        //
+        // const cardPosition = {x: 10, y: 10};
 
         const displacement = (mainMenuButtonBase.height + mainMenuButtonBase.space);
 
@@ -124,7 +101,7 @@ export default class Screen extends ScreenHelpers {
                         widthStroke: 8,
                         callbacks: {
                             mouseup: () => {
-                                this.app.game.state.setState('PLAY');
+                                this.app.game.state.setState('LOADING');
                                 // this.app.game.useMusicBox && this.app.musicBox.play();
                             }
                         }
@@ -203,20 +180,194 @@ export default class Screen extends ScreenHelpers {
                     }
                 }
             },
-            PLAY: {
-                data_card: {
-                    type: 'square',
+            LOADING: {
+                title: {
+                    type: 'text',
                     props: {
-                        ctx: this.app.game.gui.controlsCtx,
-                        x: cardPosition.x,
-                        y: cardPosition.y,
-                        width: width + 35,
-                        height,
-                        color: COLORS.WHITE[4],
-                        stroke: COLORS.BLACK[0]
+                        ctx: this.app.gui.ctx,
+                        font: '72px Mouse',
+                        text: 'LOADING GAME...',
+                        x: 50,
+                        y: mainMenuButtonBase.y + 72,
+                        // y: -(mainMenuButtonMeasure.height * (Object.keys(this.buttonsCollection.MAIN_MENU).length / 2) + 20),
+                        color: this.colors.MAIN_MENU.mainCard.text,
+                        width: 0,
+                        height: 0,
+                        center: true
                     }
                 }
-            }
+            },
+            // PLAY: {
+            //     data_card: {
+            //         type: 'square',
+            //         props: {
+            //             ctx: this.app.game.gui.controlsCtx,
+            //             x: cardPosition.x,
+            //             y: cardPosition.y,
+            //             width: width + 35,
+            //             height,
+            //             color: COLORS.WHITE[4],
+            //             stroke: COLORS.BLACK[0]
+            //         }
+            //     }
+            // }
         };
+    }
+
+    buttonCollectionEvents(type, hoverTranslatedCoords) {
+        const buttons = this.getButtons()
+
+        if (type === 'mousemove') {
+            Object.keys(buttons).forEach((key) => {
+                buttons[key].props?.callbacks?.mousemove &&
+                buttons[key].props.callbacks.mousemove(event, hoverTranslatedCoords)
+            });
+
+            this.app.gui.get.checkHoverCollection({
+                collection: this.hoverCollection,
+                event,
+                viewport: this.app.camera.viewport,
+                isHover: (key) => {
+                    if (this.buttonsStates[key] !== 'click' && this.buttonsStates[key] !== 'hover') {
+                        this.buttonsStates[key] = 'hover';
+                        this.hoverCaller = key;
+                        this.gui.hoverStateIn();
+                    }
+                },
+                isOut: (key) => {
+                    if (this.buttonsStates[key] !== 'click' && this.buttonsStates[key] !== 'normal') {
+                        this.buttonsStates[key] = 'normal';
+                        this.hoverCaller = null;
+                        this.gui.hoverStateOut();
+                    }
+                },
+                caller: this.hoverCaller,
+            });
+        }
+
+        if (type === 'mouseup') {
+            Object.keys(buttons).forEach((key) => {
+                const ctx = buttons[key].props.position === 'viewport'
+                    ? this.app.gui.get.clickCoords(event, this.app.camera.viewport)
+                    : {x: event.offsetX, y: event.offsetY};
+
+                this.app.gui.get.isClicked(
+                    buttons[key].props,
+                    ctx,
+                    () => buttons[key].props?.callbacks?.mouseup && buttons[key].props.callbacks.mouseup(event)
+                )
+            });
+        }
+
+        if (type === 'mousedown') {
+            const buttons = this.getButtons()
+            Object.keys(buttons).forEach((key) => {
+                if (!buttons[key].props?.ctx) return;
+                const ctx = buttons[key].props.position === 'viewport'
+                    ? this.app.gui.get.clickCoords(event, this.app.camera.viewport)
+                    : {x: event.offsetX, y: event.offsetY};
+
+                this.app.gui.get.isClicked(
+                    buttons[key].props,
+                    ctx,
+                    () => buttons[key].props?.callbacks?.mousedown && buttons[key].props.callbacks.mousedown(event)
+                )
+            });
+        }
+
+        if (type === 'click') {
+            const buttons = this.getButtons()
+
+            Object.keys(buttons).forEach((key) => {
+                const ctx = buttons[key].props.position === 'viewport'
+                    ? this.app.gui.get.clickCoords(event, this.app.camera.viewport)
+                    : {x: event.offsetX, y: event.offsetY};
+
+                this.app.gui.get.isClicked(
+                    buttons[key].props,
+                    ctx,
+                    () => buttons[key].props?.callbacks?.click && buttons[key].props.callbacks.click(event)
+                )
+            });
+        }
+    }
+
+    addListeners(abstractEvents) {
+        const translatedCoords = (event) => (this.app.gui.get.viewportCoords({
+            x: event.offsetX,
+            y: event.offsetY
+        }, this.app.camera.viewport));
+
+        this.app.controls.pushListener(this, 'mousemove', (event) => {
+            const tc = translatedCoords(event);
+            abstractEvents.mousemove(event, tc);
+            this.buttonCollectionEvents('mousemove', tc);
+        });
+
+        this.app.controls.pushListener(this, 'mouseup', (event) => {
+            const tc = translatedCoords(event);
+            abstractEvents.mouseup(event, tc);
+            this.buttonCollectionEvents('mouseup', tc);
+        });
+
+        this.app.controls.pushListener(this, 'mousedown', (event) => {
+            const tc = translatedCoords(event);
+            abstractEvents.mousedown(event, tc);
+            this.buttonCollectionEvents('mousedown', tc);
+        });
+
+        this.app.controls.pushListener(this, 'click', (event) => {
+            const tc = translatedCoords(event);
+            abstractEvents.click(event, tc);
+            this.buttonCollectionEvents('click', tc);
+        });
+
+    }
+
+    getButtons() {
+        const output = {};
+        Object.entries(this.buttonsCollection).forEach(key => {
+            if (key[0] !== this.app.game.state.state) return;
+            Object.entries(key[1]).forEach(button => output[button[0]] = button[1]);
+        })
+        return output;
+    }
+
+    update() {
+        this.screenData();
+    }
+
+    draw() {
+        // DECLARE COLLECTION
+        const collection = [
+            ...Object.values(this?.decorations[this?.app?.game?.state?.state] ?? {}),
+            ...Object.values(this?.buttonsCollection[this?.app?.game?.state?.state] ?? {}),
+        ];
+        // DRAW COLLECTION
+        for (let i = 0; i < collection.length; i++) {
+            try {
+                const item = collection[i];
+                if (typeof this?.app?.gui?.get[item?.type] === 'function') {
+                    this.app.gui.get[item.type](item.props);
+                }
+            } catch (error) {
+                console.error(
+                    'verify item.props are provided with next keys:' +
+                    'position, ctx, x, y, width, height, text, font, bg, stroke, widthStroke, callbacks' +
+                    error
+                );
+                debugger;
+            }
+        }
+        // CLEAR HOVER COLLECTION
+        this.hoverCollection = {};
+        // HOVER EVENTS
+        Object.entries(this.buttonsCollection[this.app.game.state.state] ?? {}).forEach(key => {
+            this.hoverCollection[key[0]] = key[1].props;
+        });
+        // CANVAS BACKGROUND
+        if (!this?.colors[this?.app?.game?.state?.state]?.background) return;
+
+        this.app.gui.ctx.canvas.style.backgroundColor = this.colors[this.app.game.state.state].background;
     }
 }

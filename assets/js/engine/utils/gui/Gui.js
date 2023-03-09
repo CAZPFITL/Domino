@@ -36,21 +36,21 @@ export default class Gui {
         if (!entity) return;
         const {x, y, width, height} = entity;
         return (
-            click.x > x &&
-            click.x < x + width &&
-            click.y > y &&
-            click.y < y + height
+          click.x > x &&
+          click.x < x + width &&
+          click.y > y &&
+          click.y < y + height
         );
     }
 
     static viewportCoords = ({x, y}, viewport) => ({
-        x: x / viewport.scale[0] + viewport.left,
-        y: y / viewport.scale[1] + viewport.top
+        x: x / viewport.scale.x + viewport.left,
+        y: y / viewport.scale.y + viewport.top
     })
 
     static clickCoords = (e, viewport) => ({
-        x: e.clientX / viewport.scale[0] + viewport.left,
-        y: e.clientY / viewport.scale[1] + viewport.top
+        x: e.clientX / viewport.scale.x + viewport.left,
+        y: e.clientY / viewport.scale.y + viewport.top
     })
 
     static entityAt(click, collection) {
@@ -58,8 +58,8 @@ export default class Gui {
         for (let i = 0; i < collection.length; i++) {
             const entity = collection[i];
 
-            if (entity.polygons instanceof Array) {
-                const polysIntersect = Gui.isPointInsidePolygon(click, entity.polygons);
+            if (entity.body.vertices instanceof Array) {
+                const polysIntersect = Gui.isPointInsidePolygon(click, entity.body.vertices);
                 if (polysIntersect)
                     return entity;
             }
@@ -89,10 +89,10 @@ export default class Gui {
     static checkHoverCollection({collection, event, viewport, isHover, isOut, caller}) {
         for (const key in collection) {
             if (collection[key]?.position === 'viewport' &&
-                Gui.isHover(collection[key], Gui.viewportCoords(event, viewport))) {
+              Gui.isHover(collection[key], Gui.viewportCoords(event, viewport))) {
                 isHover(key);
             } else if (collection[key]?.position === 'controls' &&
-                Gui.isHover(collection[key], {x: event.clientX, y: event.clientY})) {
+              Gui.isHover(collection[key], {x: event.clientX, y: event.clientY})) {
                 isHover(key);
             } else {
                 if (caller === key) {
@@ -115,28 +115,50 @@ export default class Gui {
         entity.polygons = points;
     }
 
-    static drawPolygon(ctx, entity) {
-        if (entity.polygons.length < 1) return;
+    static drawPolygon(ctx, entity, type = 'fill') {
+        if (entity.vertices.length < 1) return;
 
         ctx.beginPath();
-        ctx.moveTo(entity.polygons[0].x, entity.polygons[0].y);
+        ctx.moveTo(entity.vertices[0].x, entity.vertices[0].y);
 
-        for (let i = 1; i < entity.polygons.length; i++) {
-            ctx.lineTo(entity.polygons[i].x, entity.polygons[i].y);
+        for (let i = 1; i < entity.vertices.length; i++) {
+            ctx.lineTo(entity.vertices[i].x, entity.vertices[i].y);
         }
 
+        ctx.lineTo(entity.vertices[0].x, entity.vertices[0].y);
+
         ctx.fillStyle = entity.color ?? '#000';
-        ctx.fill();
+        ctx[type]();
+    }
+
+    static drawImage(ctx, entity, width, height) {
+        ctx.save();
+        ctx.translate(entity.body.position.x, entity.body.position.y);
+        ctx.rotate(-entity.body.angle);
+
+        ctx.drawImage(
+          entity.img,
+          width * entity.frameCounter,
+          0,
+          width,
+          height,
+          -entity.size.width / 2,
+          -entity.size.height / 2,
+          entity.size.width,
+          entity.size.height,
+        );
+
+        ctx.restore();
     }
 
     static polysIntersect(poly1, poly2) {
         for (let i = 0; i < poly1.length; i++) {
             for (let j = 0; j < poly2.length; j++) {
                 const touch = Tools.getIntersection(
-                    poly1[i],
-                    poly1[(i + 1) % poly1.length],
-                    poly2[j],
-                    poly2[(j + 1) % poly2.length],
+                  poly1[i],
+                  poly1[(i + 1) % poly1.length],
+                  poly2[j],
+                  poly2[(j + 1) % poly2.length],
                 )
                 if (touch) {
                     return true;
@@ -212,8 +234,8 @@ export default class Gui {
         stroke && (ctx.strokeRect(x, y, cap, height));
 
         ctx.fillStyle = fillColor === 'green-red' ?
-            `rgb(${normalizedProgress}, ${255 - normalizedProgress}, 0)` :
-            'red-green' ? `rgb(${255 - normalizedProgress}, ${normalizedProgress}, 0)` : fillColor;
+          `rgb(${normalizedProgress}, ${255 - normalizedProgress}, 0)` :
+          'red-green' ? `rgb(${255 - normalizedProgress}, ${normalizedProgress}, 0)` : fillColor;
         ctx.fillRect(x, y, progress, height);
 
 
@@ -226,17 +248,5 @@ export default class Gui {
         ctx.lineTo(x2, y2);
         ctx.strokeStyle = color;
         ctx.stroke();
-    }
-
-    static image({ctx, x, y, width, height, img}) {
-        if (!img) return;
-
-        const image = new Image(width, height); // Using optional size for image
-        image.onload = drawImageActualSize; // Draw when image has loaded
-
-        function drawImageActualSize() {
-            image.src = img;
-            ctx.drawImage(this, x, y, this.width, this.height);
-        }
     }
 }
