@@ -7,45 +7,51 @@ export const dominoSize = {
 
 const _default = [false,false]
 
+const pl = window.planck;
+
 export default class Domino {
+
+    id
+    app
+    frameCounter
+    states
+    img
+    fixture
+    body
+    shape
+    normals
+    vertices
+
     constructor({id = 0, app, size = _default, coords = _default, value}) {
+        this.id = id;
+        this.app = app;
+        this.frameCounter = id;
         const [x, y, width, height] = [
-            (coords[0] ? coords[0] : Math.random() * 200),
-            (coords[1] ? coords[1] : Math.random() * 200),
+            (coords[0] ? coords[0] : 0),
+            (coords[1] ? coords[1] : 0),
             (size[0] ? size[0] : dominoSize.width),
             (size[1] ? size[1] : dominoSize.height)
         ];
-
-        this.id = id;
-
-        this.app = app;
-        this.isFliped = false;
-
-        this.frameCounter = id;
-        this.value = [...value];
+        this.states = {
+            isFlipped: true,
+            value: [...value]
+        }
         this.img = new Image(width, height);
         this.img.src = './assets/images/Fichas4.png';
+        this.fixture = this.app.physics.world.createDynamicBody(pl.Vec2(x, y)).createFixture(pl.Box(width, height), 5.0);
 
-        const options = {
-            frictionStatic: 0.010,
-            frictionAir: 0.010,
-            friction: 0.010,
-            density: 0.010,
-            mass: 0.010
-        }
-
-        this.body = Matter.Bodies.rectangle(x, y, width, height, {angle: Math.random() * 8}, options);
-        this.size = {width, height}
-
-        Matter.Composite.add(app.physics.world, [this.body]);
+        this.body = this.fixture.m_body;
+        this.position = this.body.c_position;
+        this.shape = this.fixture.m_shape;
+        this.vertices = this.shape.m_vertices;
     }
 
     draw() {
         if (this.app.game.state.state === PLAY_GAME || this.app.game.state.state === GAME_OVER) {
-            if (this.isFliped) {
-                this.app.gui.get.drawPolygon(this.app.gui.ctx, this);
-            } else {
-                this.app.gui.get.drawImage(this.app.gui.ctx, this, 400, 800);
+            if (this.states.isFlipped) {
+                for (let fixture = this.body.getFixtureList(); fixture; fixture = fixture.getNext()) {
+                    this.app.gui.get.drawPlPolygon(this.app.gui.ctx, this)
+                }
             }
         }
     }

@@ -30,21 +30,15 @@ export default class Domino {
     #loadData() {
         // Load Player Controls
         this.app.player = new Player(this.app, this);
-        // // Load Music Box
-        this.useMusicBox && this.app.musicBox.addSong(gameSongs);
-        // Load Main song
-        this.useMusicBox && this.app.musicBox.changeSong(mainSong);
+        // // // Load Music Box
+        // this.useMusicBox && this.app.musicBox.addSong(gameSongs);
+        // // Load Main song
+        // this.useMusicBox && this.app.musicBox.changeSong(mainSong);
         this.useMusicBox && this.app.musicBox.autoplay();
         // load Controls listeners
         this.app.controls.addListeners();
         // Set State to LOAD_GAME_LEVEL
         this.state.setState('MAIN_MENU');
-        // update gravity to zero
-        this.app.physics.engine.gravity = {
-            "x": 0,
-            "y": 0,
-            "scale": 0.1
-        }
     }
 
     #loadGameLevel() {
