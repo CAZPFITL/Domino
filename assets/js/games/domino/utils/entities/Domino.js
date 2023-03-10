@@ -39,6 +39,7 @@ export default class Domino {
         this.img = new Image(width, height);
         this.img.src = './assets/images/Fichas4.png';
         this.fixture = this.app.physics.world.createDynamicBody(pl.Vec2(x, y)).createFixture(pl.Box(width, height), 5.0);
+
         this.body = this.fixture.m_body;
         this.position = this.body.c_position;
         this.shape = this.fixture.m_shape;
@@ -49,13 +50,9 @@ export default class Domino {
         if (this.app.game.state.state === PLAY_GAME || this.app.game.state.state === GAME_OVER) {
             if (this.states.isFlipped) {
                 for (let fixture = this.body.getFixtureList(); fixture; fixture = fixture.getNext()) {
-                    this.app.physics.processBody(this, fixture)
                     this.app.gui.get.drawPlPolygon(this.app.gui.ctx, this)
                 }
             }
-            // else {
-            //     this.app.gui.get.drawImage(this.app.gui.ctx, this, 400, 800);
-            // }
         }
     }
 }

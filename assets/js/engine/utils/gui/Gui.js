@@ -187,21 +187,25 @@ export default class Gui {
     /**
      * PLANCKJS HELPERS
      */
-    static drawPlPolygon(ctx, entity, color="#c700ff") {
+    static drawPlPolygon(ctx, entity, ui, color="#c700ff") {
+        ctx.save();
         let points = entity.vertices;
 
         if (!points || !points.length) {
             return;
         }
+        ctx.translate(entity.position.c.x, -entity.position.c.y)
+        ctx.rotate(-entity.position.a)
 
         ctx.beginPath();
-        ctx.moveTo(points[0].x + entity.position.c.x, points[0].y - entity.position.c.y);
+        ctx.moveTo(points[0].x, -points[0].y);
         for (let i = 1; i < points.length; i++) {
-            ctx.lineTo(points[i].x + entity.position.c.x, points[i].y - entity.position.c.y);
+            ctx.lineTo(points[i].x, -points[i].y);
         }
         ctx.strokeStyle = color;
         ctx.lineWidth = 5;
         ctx.closePath();
         ctx.stroke();
+        ctx.restore();
     }
 }

@@ -46,7 +46,8 @@ export default class Board {
             new Wall(this.app, pl.Vec2(-400.0, -400.0), pl.Vec2(400.0, -400.0)),
             new Wall(this.app, pl.Vec2(-400.0, 400.0), pl.Vec2(400.0, 400.0)),
             new Wall(this.app, pl.Vec2(-400.0, -400.0), pl.Vec2(-400.0, 400.0)),
-            new Wall(this.app, pl.Vec2(400.0, -400.0), pl.Vec2(400.0, 400.0))
+            new Wall(this.app, pl.Vec2(400.0, -400.0), pl.Vec2(400.0, 400.0)),
+            new Wall(this.app, pl.Vec2(-400.0, -400.0), pl.Vec2(400.0, -200.0))
         ];
         console.log(this.bodyParts)
 
@@ -56,21 +57,8 @@ export default class Board {
         this.bodyParts.forEach((part)=>{
             // console.log(part)
             for (let fixture = part.body.getFixtureList(); fixture; fixture = fixture.getNext()) {
-                // this.app.physics.processBody(this, fixture)
                 this.app.gui.get.drawPlPolygon(this.app.gui.ctx, part)
             }
         })
-        // if (!this.no_draw && this.app.game.state.state === PLAY_GAME || this.app.game.state.state === GAME_OVER) {
-        //     const bodies = this.bodyParts;
-        //     const context = this.app.gui.ctx;
-        //     // this.app.gui.get.drawImage(this.app.gui.ctx, this, 1500, 1500);
-        //     for (let i = 0; i < bodies.length; i += 1) {
-        //         context.lineWidth = 10;
-        //         context.strokeStyle = '#999';
-        //         this.app.gui.get.drawPolygon(context, bodies[i], 'stroke');
-        //         context.lineWidth = 1;
-        //         context.strokeStyle = '#000';
-        //     }
-        // }
     }
 }

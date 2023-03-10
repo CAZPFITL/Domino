@@ -64,10 +64,13 @@ export default class AppMethods {
     update() {
         this.physics.world.step(1 / 60);
         for (let key in this.factory.binnacle) {
-            if (this.factory.binnacle[key] instanceof Array) {
+            if (Array.isArray(this.factory.binnacle[key])) {
                 for (let i = 0; i < this.factory.binnacle[key].length; i++) {
-                    (Boolean(this.factory.binnacle[key][i].update)) &&
-                    this.factory.binnacle[key][i].update();
+                    const el = this.factory.binnacle[key][i];
+                    // NORMAL UPDATE
+                    if (Boolean(el?.update)) {
+                        this.factory.binnacle[key][i].update();
+                    }
                 }
             }
         }
